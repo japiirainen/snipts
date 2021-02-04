@@ -1,0 +1,18 @@
+{
+   "name": "snipts",
+   "version": "0.0.1",
+   "description": "A place for sharing and finding useful code snippets.",
+   "repository": "https://github.com/japiirainen/snipts.git",
+   "author": "Joona Piirainen <joona.piirainen@gmail.com>",
+   "license": "MIT",
+   "private": true,
+   "workspaces": [
+      "client",
+      "server"
+   ],
+   "scripts": {
+      "server:s": "yarn workspace server start",
+      "server:d": "yarn workspace server dev",
+      "server:b": "yarn workspace server build"
+   }
+}
