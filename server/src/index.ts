@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express, { Express } from 'express'
 import morgan from 'morgan'
+import { authRoutes } from './features/auth/AuthRouter'
 import { config } from './infrastructure/config'
 import { createDbPool } from './infrastructure/db'
 import { initializeEnv } from './infrastructure/env'
@@ -28,7 +29,11 @@ const createApp = async (): Promise<Express> => {
          }
       })
       .use(initializeEnv(pool))
+      .get('/me', authRoutes.me)
+      .post('/register', authRoutes.register)
    return app
 }
 
-createApp().then(app => app.listen(config.port, () => logger.info(`App listening on ${config.port}`)))
+createApp().then(app =>
+   app.listen(config.port, () => logger.info(`App listening on ${config.port}`))
+)
