@@ -43,19 +43,38 @@ var cookie_parser_1 = __importDefault(require("cookie-parser"));
 var cors_1 = __importDefault(require("cors"));
 var express_1 = __importDefault(require("express"));
 var morgan_1 = __importDefault(require("morgan"));
-var constants_1 = require("./infrastructure/constants");
+var config_1 = require("./infrastructure/config");
+var db_1 = require("./infrastructure/db");
+var env_1 = require("./infrastructure/env");
+var logger_1 = require("./infrastructure/logger");
 var createApp = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var app;
+    var prerequisites, pool, app;
     return __generator(this, function (_a) {
-        app = express_1.default();
-        app.use(morgan_1.default("dev"))
-            .use(cors_1.default({
-            credentials: true,
-            origin: "http://localhost:4000",
-        }))
-            .use(express_1.default.json())
-            .use(cookie_parser_1.default());
-        return [2 /*return*/, app];
+        switch (_a.label) {
+            case 0:
+                prerequisites = [db_1.createDbPool(), Promise.resolve()];
+                return [4 /*yield*/, Promise.all(prerequisites)];
+            case 1:
+                pool = (_a.sent())[0];
+                app = express_1.default();
+                app.use(morgan_1.default('dev'))
+                    .use(cors_1.default({
+                    credentials: true,
+                    origin: 'http://localhost:4000',
+                }))
+                    .use(express_1.default.json())
+                    .use(cookie_parser_1.default())
+                    .get('/health', function (_, res) {
+                    if (pool) {
+                        res.status(200).json({ status: 'healthy' });
+                    }
+                    else {
+                        res.status(503).json({ status: 'unavailable' });
+                    }
+                })
+                    .use(env_1.initializeEnv(pool));
+                return [2 /*return*/, app];
+        }
     });
 }); };
-createApp().then(function (app) { return app.listen(constants_1.PORT, function () { return console.log("listening on 4000"); }); });
+createApp().then(function (app) { return app.listen(config_1.config.port, function () { return logger_1.logger.info("App listening on " + config_1.config.port); }); });
