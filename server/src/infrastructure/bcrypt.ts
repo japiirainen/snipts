@@ -4,7 +4,7 @@ import { CustomError } from 'ts-custom-error'
 import { v4 as uuidv4 } from 'uuid'
 import { ApplicationError } from './error'
 
-class BcryptError extends CustomError implements ApplicationError {
+export class BcryptError extends CustomError implements ApplicationError {
    status = 500
    code = uuidv4()
    log = true

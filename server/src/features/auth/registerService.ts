@@ -2,7 +2,7 @@ import { CustomError } from 'ts-custom-error'
 import { ApplicationError, InvalidRequest, ValidationFailed } from '../../infrastructure/error'
 import * as I from 'io-ts'
 import * as TE from 'fp-ts/TaskEither'
-import { hashPassword } from '../../infrastructure/bcrypt'
+import { BcryptError, hashPassword } from '../../infrastructure/bcrypt'
 import { pipe } from 'fp-ts/function'
 import { Env } from '../../infrastructure/env'
 import { mapLeft } from 'fp-ts/lib/Either'
@@ -10,6 +10,7 @@ import * as O from 'fp-ts/Option'
 import { findUserByEmail, findUserByUsername, insertUser, InsertUserDTO } from './userRepo'
 import { Pool } from 'pg'
 import * as E from 'fp-ts/lib/Either'
+import { DBError } from '../../infrastructure/db'
 
 class UserAlreadyExists extends CustomError implements ApplicationError {
    status = 400
@@ -25,7 +26,10 @@ const RegisterBody = I.interface({
 
 type RegisterBodyT = I.TypeOf<typeof RegisterBody>
 
-export const register = (env: Env, rawBody: unknown) => {
+export const register = (
+   env: Env,
+   rawBody: unknown
+): TE.TaskEither<DBError | ValidationFailed | InvalidRequest, void> => {
    return pipe(
       TE.fromEither(
          pipe(
@@ -42,7 +46,10 @@ export const register = (env: Env, rawBody: unknown) => {
       TE.chain(dto => tryInsertUser(dto, env.pool))
    )
 }
-const tryInsertUser = (dto: InsertUserDTO, pool: Pool) =>
+const tryInsertUser = (
+   dto: InsertUserDTO,
+   pool: Pool
+): TE.TaskEither<DBError | UserAlreadyExists | BcryptError, void> =>
    pipe(
       findUserByEmail(dto.email, pool),
       TE.alt(() => findUserByUsername(dto.password, pool)),
