@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
-import { toPublicUser } from './user'
-import { register as processRegister } from './registerService'
-import { processError } from '../../infrastructure/error'
-import { pipe } from 'fp-ts/function'
 import * as E from 'fp-ts/Either'
+import { pipe } from 'fp-ts/function'
+import { processError } from '../../infrastructure/error'
+import { register as processRegister } from './registerService'
+import { toPublicUser } from './user'
 
 export const authRoutes = {
    me(req: Request, res: Response): void {

@@ -1,7 +1,7 @@
-import { Response } from "express"
-import { CustomError } from "ts-custom-error"
-import { logger } from "./logger"
-import { v4 as uuidv4 } from "uuid"
+import { Response } from 'express'
+import { CustomError } from 'ts-custom-error'
+import { v4 as uuidv4 } from 'uuid'
+import { logger } from './logger'
 
 export interface ApplicationError extends Error {
    /** What HTTP status code to respond with */
@@ -35,12 +35,12 @@ class UnexpectedError extends CustomError implements ApplicationError {
 
 export class InvalidRequest extends CustomError implements ApplicationError {
    status = 500
-   code = "InvalidRequest"
+   code = 'InvalidRequest'
    log = false
 }
 
 export class ValidationFailed extends CustomError implements ApplicationError {
    status = 500
-   code = "ValidationFailed"
+   code = 'ValidationFailed'
    log = false
 }

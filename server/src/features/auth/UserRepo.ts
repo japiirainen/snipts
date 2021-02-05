@@ -1,9 +1,9 @@
+import * as A from 'fp-ts/Array'
+import * as O from 'fp-ts/Option'
+import * as TE from 'fp-ts/TaskEither'
 import { Pool } from 'pg'
 import { DBError, witConn } from '../../infrastructure/db'
 import { User } from './user'
-import * as TE from 'fp-ts/TaskEither'
-import * as O from 'fp-ts/Option'
-import * as A from 'fp-ts/Array'
 
 export interface InsertUserDTO {
    username: string

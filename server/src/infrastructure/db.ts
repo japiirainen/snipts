@@ -1,8 +1,8 @@
-import { Pool, PoolClient } from 'pg'
-import { v4 as uuidv4 } from 'uuid'
-import { migrate } from 'postgres-migrations'
 import * as TE from 'fp-ts/TaskEither'
+import { Pool, PoolClient } from 'pg'
+import { migrate } from 'postgres-migrations'
 import { CustomError } from 'ts-custom-error'
+import { v4 as uuidv4 } from 'uuid'
 import { ApplicationError } from './error'
 import { logger } from './logger'
 
@@ -36,7 +36,10 @@ export const createDbPool = async (): Promise<Pool | null> => {
    return pool
 }
 
-export const witConn = <T>(pool: Pool, f: (conn: PoolClient) => Promise<T>): TE.TaskEither<DBError, T> =>
+export const witConn = <T>(
+   pool: Pool,
+   f: (conn: PoolClient) => Promise<T>
+): TE.TaskEither<DBError, T> =>
    TE.tryCatch(
       async () => {
          const client = await pool.connect()

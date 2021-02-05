@@ -1,16 +1,15 @@
-import { CustomError } from 'ts-custom-error'
-import { ApplicationError, InvalidRequest, ValidationFailed } from '../../infrastructure/error'
-import * as I from 'io-ts'
-import * as TE from 'fp-ts/TaskEither'
-import { BcryptError, hashPassword } from '../../infrastructure/bcrypt'
 import { pipe } from 'fp-ts/function'
-import { Env } from '../../infrastructure/env'
 import { mapLeft } from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/Option'
-import { findUserByEmail, findUserByUsername, insertUser, InsertUserDTO } from './userRepo'
+import * as TE from 'fp-ts/TaskEither'
+import * as I from 'io-ts'
 import { Pool } from 'pg'
-import * as E from 'fp-ts/lib/Either'
+import { CustomError } from 'ts-custom-error'
+import { BcryptError, hashPassword } from '../../infrastructure/bcrypt'
 import { DBError } from '../../infrastructure/db'
+import { Env } from '../../infrastructure/env'
+import { ApplicationError, InvalidRequest, ValidationFailed } from '../../infrastructure/error'
+import { findUserByEmail, findUserByUsername, insertUser, InsertUserDTO } from './userRepo'
 
 class UserAlreadyExists extends CustomError implements ApplicationError {
    status = 400
