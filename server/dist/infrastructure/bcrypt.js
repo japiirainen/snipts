@@ -1,17 +1,4 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -33,27 +20,20 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.hashPassword = exports.comparePasswords = exports.BcryptError = void 0;
-var bcrypt_1 = require("bcrypt");
-var TE = __importStar(require("fp-ts/TaskEither"));
-var ts_custom_error_1 = require("ts-custom-error");
-var uuid_1 = require("uuid");
-var BcryptError = /** @class */ (function (_super) {
-    __extends(BcryptError, _super);
-    function BcryptError() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.status = 500;
-        _this.code = uuid_1.v4();
-        _this.log = true;
-        return _this;
+const bcrypt_1 = require("bcrypt");
+const TE = __importStar(require("fp-ts/TaskEither"));
+const ts_custom_error_1 = require("ts-custom-error");
+const uuid_1 = require("uuid");
+class BcryptError extends ts_custom_error_1.CustomError {
+    constructor() {
+        super(...arguments);
+        this.status = 500;
+        this.code = uuid_1.v4();
+        this.log = true;
     }
-    return BcryptError;
-}(ts_custom_error_1.CustomError));
+}
 exports.BcryptError = BcryptError;
-var comparePasswords = function (hashedPassword, attempt) {
-    return TE.tryCatch(function () { return bcrypt_1.compare(attempt, hashedPassword); }, function (_) { return new BcryptError('error while comparing passwords'); });
-};
+const comparePasswords = (hashedPassword, attempt) => TE.tryCatch(() => bcrypt_1.compare(attempt, hashedPassword), _ => new BcryptError('error while comparing passwords'));
 exports.comparePasswords = comparePasswords;
-var hashPassword = function (password) {
-    return TE.tryCatch(function () { return bcrypt_1.hash(password, 10); }, function (_) { return new BcryptError('error while hashing password'); });
-};
+const hashPassword = (password) => TE.tryCatch(() => bcrypt_1.hash(password, 10), _ => new BcryptError('error while hashing password'));
 exports.hashPassword = hashPassword;

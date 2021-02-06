@@ -50,6 +50,7 @@
       "dev": "NODE_ENV=development tsc && node dist/index.js",
       "c": "tsc --noEmit",
       "test": "NODE_ENV=testing jest --watchAll",
-      "test:coverage": "NODE_ENV=testing jest --coverage"
+      "test:coverage": "NODE_ENV=testing jest --coverage",
+      "db": "docker-compose -f docker-compose-dev.yml up --build"
    }
 }

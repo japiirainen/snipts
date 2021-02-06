@@ -20,7 +20,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logger = void 0;
-var winston_1 = __importStar(require("winston"));
+const winston_1 = __importStar(require("winston"));
 exports.logger = winston_1.default.createLogger({
     format: winston_1.format.combine(winston_1.format.timestamp(), winston_1.format.json()),
     transports: [new winston_1.default.transports.Console()],

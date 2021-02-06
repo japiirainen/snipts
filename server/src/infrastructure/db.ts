@@ -3,6 +3,7 @@ import { Pool, PoolClient } from 'pg'
 import { migrate } from 'postgres-migrations'
 import { CustomError } from 'ts-custom-error'
 import { v4 as uuidv4 } from 'uuid'
+import { config } from './config'
 import { ApplicationError } from './error'
 import { logger } from './logger'
 
@@ -14,11 +15,11 @@ export class DBError extends CustomError implements ApplicationError {
 
 export const createDbPool = async (): Promise<Pool | null> => {
    const pool = new Pool({
-      database: process.env.DB_NAME,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
+      database: config.db.database,
+      user: config.db.user,
+      password: config.db.password,
+      host: config.db.host,
+      port: Number(config.db.port),
    })
 
    try {
@@ -36,7 +37,7 @@ export const createDbPool = async (): Promise<Pool | null> => {
    return pool
 }
 
-export const witConn = <T>(
+export const withConn = <T>(
    pool: Pool,
    f: (conn: PoolClient) => Promise<T>
 ): TE.TaskEither<DBError, T> =>

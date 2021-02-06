@@ -32,8 +32,8 @@ const createApp = async (): Promise<Express> => {
       })
       .use(initializeEnv(pool))
       .get('/me', requireUser, authRoutes.me)
-      .post('login', authRoutes.login)
-      .post('/logout', authRoutes.logout)
+      .post('/login', authRoutes.login)
+      .post('/logout', requireUser, authRoutes.logout)
       .post('/register', authRoutes.register)
       .post('/refresh-token', authRoutes.refreshToken)
 

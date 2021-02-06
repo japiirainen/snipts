@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.config = void 0;
-var dotenv_1 = __importDefault(require("dotenv"));
-var path_1 = __importDefault(require("path"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
 dotenv_1.default.config({
     path: process.env.NODE_ENV === 'production'
         ? path_1.default.join(__dirname, '..', '..', '.env')
@@ -30,4 +30,3 @@ exports.config = {
         rt: process.env.REFRESH_TOKEN_SECRET,
     },
 };
-console.log(exports.config);
