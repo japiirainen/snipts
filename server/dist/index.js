@@ -44,7 +44,7 @@ var cors_1 = __importDefault(require("cors"));
 var express_1 = __importDefault(require("express"));
 var morgan_1 = __importDefault(require("morgan"));
 var authMiddleware_1 = require("./features/auth/authMiddleware");
-var authRouter_1 = require("./features/auth/authRouter");
+var authRoutes_1 = require("./features/auth/authRoutes");
 var config_1 = require("./infrastructure/config");
 var db_1 = require("./infrastructure/db");
 var env_1 = require("./infrastructure/env");
@@ -75,8 +75,9 @@ var createApp = function () { return __awaiter(void 0, void 0, void 0, function 
                     }
                 })
                     .use(env_1.initializeEnv(pool))
-                    .get('/me', authMiddleware_1.requireUser, authRouter_1.authRoutes.me)
-                    .post('/register', authRouter_1.authRoutes.register);
+                    .get('/me', authMiddleware_1.requireUser, authRoutes_1.authRoutes.me)
+                    .post('/register', authRoutes_1.authRoutes.register)
+                    .post('/refresh-token', authRoutes_1.authRoutes.refreshToken);
                 return [2 /*return*/, app];
         }
     });

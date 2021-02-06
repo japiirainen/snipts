@@ -3,7 +3,7 @@ import cors from 'cors'
 import express, { Express } from 'express'
 import morgan from 'morgan'
 import { requireUser } from './features/auth/authMiddleware'
-import { authRoutes } from './features/auth/authRouter'
+import { authRoutes } from './features/auth/authRoutes'
 import { config } from './infrastructure/config'
 import { createDbPool } from './infrastructure/db'
 import { initializeEnv } from './infrastructure/env'
@@ -32,6 +32,7 @@ const createApp = async (): Promise<Express> => {
       .use(initializeEnv(pool))
       .get('/me', requireUser, authRoutes.me)
       .post('/register', authRoutes.register)
+      .post('/refresh-token', authRoutes.refreshToken)
    return app
 }
 
