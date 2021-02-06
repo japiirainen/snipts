@@ -68,7 +68,7 @@ const tryInsertUser = (
 const validateBody = (body: RegisterBodyT): O.Option<InsertUserDTO> =>
    pipe(
       O.of(body),
-      O.filter(x => x.username.length >= 4),
+      O.filter(x => x.username.length >= 2),
       O.filter(x => x.username.length < 99),
       O.filter(x => x.email.includes('@')),
       O.filter(x => x.password.length >= 6),

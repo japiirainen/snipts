@@ -44,14 +44,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.register = void 0;
-var ts_custom_error_1 = require("ts-custom-error");
-var error_1 = require("../../infrastructure/error");
-var I = __importStar(require("io-ts"));
-var TE = __importStar(require("fp-ts/TaskEither"));
-var bcrypt_1 = require("../../infrastructure/bcrypt");
 var function_1 = require("fp-ts/function");
 var Either_1 = require("fp-ts/lib/Either");
 var O = __importStar(require("fp-ts/Option"));
+var TE = __importStar(require("fp-ts/TaskEither"));
+var I = __importStar(require("io-ts"));
+var ts_custom_error_1 = require("ts-custom-error");
+var bcrypt_1 = require("../../infrastructure/bcrypt");
+var error_1 = require("../../infrastructure/error");
 var userRepo_1 = require("./userRepo");
 var UserAlreadyExists = /** @class */ (function (_super) {
     __extends(UserAlreadyExists, _super);
@@ -77,10 +77,9 @@ var register = function (env, rawBody) {
 exports.register = register;
 var tryInsertUser = function (dto, pool) {
     return function_1.pipe(userRepo_1.findUserByEmail(dto.email, pool), TE.alt(function () { return userRepo_1.findUserByUsername(dto.password, pool); }), TE.chain(function (maybeUser) {
-        console.log(maybeUser);
         return function_1.pipe(maybeUser, O.fold(function () { return TE.right(maybeUser); }, function () { return TE.left(new UserAlreadyExists()); }));
     }), TE.chain(function () { return bcrypt_1.hashPassword(dto.password); }), TE.chain(function (hashedPassword) { return userRepo_1.insertUser(__assign(__assign({}, dto), { password: hashedPassword }), pool); }));
 };
 var validateBody = function (body) {
-    return function_1.pipe(O.of(body), O.filter(function (x) { return x.username.length >= 4; }), O.filter(function (x) { return x.username.length < 99; }), O.filter(function (x) { return x.email.includes('@'); }), O.filter(function (x) { return x.password.length >= 6; }), O.map(function (x) { return ({ username: x.username, password: x.password, email: x.email }); }));
+    return function_1.pipe(O.of(body), O.filter(function (x) { return x.username.length >= 2; }), O.filter(function (x) { return x.username.length < 99; }), O.filter(function (x) { return x.email.includes('@'); }), O.filter(function (x) { return x.password.length >= 6; }), O.map(function (x) { return ({ username: x.username, password: x.password, email: x.email }); }));
 };

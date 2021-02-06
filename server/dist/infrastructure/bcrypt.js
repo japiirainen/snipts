@@ -32,7 +32,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hashPassword = exports.comparePasswords = void 0;
+exports.hashPassword = exports.comparePasswords = exports.BcryptError = void 0;
 var bcrypt_1 = require("bcrypt");
 var TE = __importStar(require("fp-ts/TaskEither"));
 var ts_custom_error_1 = require("ts-custom-error");
@@ -48,6 +48,7 @@ var BcryptError = /** @class */ (function (_super) {
     }
     return BcryptError;
 }(ts_custom_error_1.CustomError));
+exports.BcryptError = BcryptError;
 var comparePasswords = function (hashedPassword, attempt) {
     return TE.tryCatch(function () { return bcrypt_1.compare(attempt, hashedPassword); }, function (_) { return new BcryptError('error while comparing passwords'); });
 };

@@ -43,7 +43,8 @@ var cookie_parser_1 = __importDefault(require("cookie-parser"));
 var cors_1 = __importDefault(require("cors"));
 var express_1 = __importDefault(require("express"));
 var morgan_1 = __importDefault(require("morgan"));
-var AuthRouter_1 = require("./features/auth/AuthRouter");
+var authMiddleware_1 = require("./features/auth/authMiddleware");
+var authRouter_1 = require("./features/auth/authRouter");
 var config_1 = require("./infrastructure/config");
 var db_1 = require("./infrastructure/db");
 var env_1 = require("./infrastructure/env");
@@ -74,12 +75,14 @@ var createApp = function () { return __awaiter(void 0, void 0, void 0, function 
                     }
                 })
                     .use(env_1.initializeEnv(pool))
-                    .get('/me', AuthRouter_1.authRoutes.me)
-                    .post('/register', AuthRouter_1.authRoutes.register);
+                    .get('/me', authMiddleware_1.requireUser, authRouter_1.authRoutes.me)
+                    .post('/register', authRouter_1.authRoutes.register);
                 return [2 /*return*/, app];
         }
     });
 }); };
 createApp().then(function (app) {
-    return app.listen(config_1.config.port, function () { return logger_1.logger.info("App listening on " + config_1.config.port); });
+    return app.listen(config_1.config.application.port, function () {
+        return logger_1.logger.info(config_1.config.application.name + " is listening on " + config_1.config.application.port);
+    });
 });

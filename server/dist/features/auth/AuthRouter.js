@@ -20,11 +20,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authRoutes = void 0;
-var user_1 = require("./user");
-var registerService_1 = require("./registerService");
-var error_1 = require("../../infrastructure/error");
-var function_1 = require("fp-ts/function");
 var E = __importStar(require("fp-ts/Either"));
+var function_1 = require("fp-ts/function");
+var error_1 = require("../../infrastructure/error");
+var registerService_1 = require("./registerService");
+var user_1 = require("./user");
 exports.authRoutes = {
     me: function (req, res) {
         res.json(user_1.toPublicUser(req.env.user));

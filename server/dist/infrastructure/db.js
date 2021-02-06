@@ -69,11 +69,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.witConn = exports.createDbPool = exports.DBError = void 0;
-var pg_1 = require("pg");
-var uuid_1 = require("uuid");
-var postgres_migrations_1 = require("postgres-migrations");
 var TE = __importStar(require("fp-ts/TaskEither"));
+var pg_1 = require("pg");
+var postgres_migrations_1 = require("postgres-migrations");
 var ts_custom_error_1 = require("ts-custom-error");
+var uuid_1 = require("uuid");
 var logger_1 = require("./logger");
 var DBError = /** @class */ (function (_super) {
     __extends(DBError, _super);

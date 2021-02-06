@@ -15,8 +15,8 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ValidationFailed = exports.InvalidRequest = exports.processError = void 0;
 var ts_custom_error_1 = require("ts-custom-error");
-var logger_1 = require("./logger");
 var uuid_1 = require("uuid");
+var logger_1 = require("./logger");
 var processError = function (res) { return function (err) {
     if (!err.code && !err.status) {
         err = new UnexpectedError(err.message);
@@ -44,7 +44,7 @@ var InvalidRequest = /** @class */ (function (_super) {
     function InvalidRequest() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.status = 500;
-        _this.code = "InvalidRequest";
+        _this.code = 'InvalidRequest';
         _this.log = false;
         return _this;
     }
@@ -56,7 +56,7 @@ var ValidationFailed = /** @class */ (function (_super) {
     function ValidationFailed() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.status = 500;
-        _this.code = "ValidationFailed";
+        _this.code = 'ValidationFailed';
         _this.log = false;
         return _this;
     }
