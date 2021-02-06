@@ -76,6 +76,8 @@ var createApp = function () { return __awaiter(void 0, void 0, void 0, function 
                 })
                     .use(env_1.initializeEnv(pool))
                     .get('/me', authMiddleware_1.requireUser, authRoutes_1.authRoutes.me)
+                    .post('login', authRoutes_1.authRoutes.login)
+                    .post('/logout', authRoutes_1.authRoutes.logout)
                     .post('/register', authRoutes_1.authRoutes.register)
                     .post('/refresh-token', authRoutes_1.authRoutes.refreshToken);
                 return [2 /*return*/, app];

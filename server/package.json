@@ -49,7 +49,7 @@
       "start": "NODE_ENV=production tsc && node dist/index.js",
       "dev": "NODE_ENV=development tsc && node dist/index.js",
       "c": "tsc --noEmit",
-      "test": "NODE_ENV=development jest --watchAll",
-      "test:coverage": "NODE_ENV=development jest --coverage"
+      "test": "NODE_ENV=testing jest --watchAll",
+      "test:coverage": "NODE_ENV=testing jest --coverage"
    }
 }

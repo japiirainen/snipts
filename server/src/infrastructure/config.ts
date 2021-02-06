@@ -5,6 +5,8 @@ dotenv.config({
    path:
       process.env.NODE_ENV === 'production'
          ? path.join(__dirname, '..', '..', '.env')
+         : process.env.NODE_ENV === 'testing'
+         ? path.join(__dirname, '..', '..', '.env.test')
          : path.join(__dirname, '..', '..', '.env.development'),
 })
 

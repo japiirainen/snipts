@@ -9,7 +9,9 @@ var path_1 = __importDefault(require("path"));
 dotenv_1.default.config({
     path: process.env.NODE_ENV === 'production'
         ? path_1.default.join(__dirname, '..', '..', '.env')
-        : path_1.default.join(__dirname, '..', '..', '.env.development'),
+        : process.env.NODE_ENV === 'testing'
+            ? path_1.default.join(__dirname, '..', '..', '.env.test')
+            : path_1.default.join(__dirname, '..', '..', '.env.development'),
 });
 exports.config = {
     application: {
@@ -28,3 +30,4 @@ exports.config = {
         rt: process.env.REFRESH_TOKEN_SECRET,
     },
 };
+console.log(exports.config);

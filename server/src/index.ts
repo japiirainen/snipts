@@ -13,6 +13,7 @@ const createApp = async (): Promise<Express> => {
    const prerequisites = [createDbPool(), Promise.resolve()] as const
    const [pool] = await Promise.all(prerequisites)
    const app = express()
+
    app.use(morgan('dev'))
       .use(
          cors({
@@ -31,8 +32,11 @@ const createApp = async (): Promise<Express> => {
       })
       .use(initializeEnv(pool))
       .get('/me', requireUser, authRoutes.me)
+      .post('login', authRoutes.login)
+      .post('/logout', authRoutes.logout)
       .post('/register', authRoutes.register)
       .post('/refresh-token', authRoutes.refreshToken)
+
    return app
 }
 
