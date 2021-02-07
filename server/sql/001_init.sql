@@ -14,6 +14,7 @@ CREATE TABLE snippets (
     title text NOT NULL,
     description text,
     content text NOT NULL,
+    creator BIGINT NOT NULL REFERENCES users (id),
     created_on timestamptz NOT NULL DEFAULT now()
 );
 CREATE TABLE likes();

@@ -23,13 +23,11 @@ const createApp = async (): Promise<Express> => {
       )
       .use(express.json())
       .use(cookieParser())
-      .get('/health', (_, res) => {
-         if (pool) {
-            res.status(200).json({ status: 'healthy' })
-         } else {
-            res.status(503).json({ status: 'unavailable' })
-         }
-      })
+      .get('/health', (_, res) =>
+         pool
+            ? res.status(200).json({ status: 'healthy' })
+            : res.status(503).json({ status: 'unavailable' })
+      )
       .use(initializeEnv(pool))
       .get('/me', requireUser, authRoutes.me)
       .post('/login', authRoutes.login)
