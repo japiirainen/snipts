@@ -28,12 +28,12 @@ type RegisterBodyT = I.TypeOf<typeof RegisterBody>
 export const register = (
    env: Env,
    rawBody: unknown
-): TE.TaskEither<DBError | ValidationFailed | InvalidRequest, void> => {
-   return pipe(
+): TE.TaskEither<DBError | ValidationFailed | InvalidRequest, void> =>
+   pipe(
       TE.fromEither(
          pipe(
             RegisterBody.decode(rawBody),
-            mapLeft(_ => new InvalidRequest())
+            mapLeft(() => new InvalidRequest())
          )
       ),
       TE.chain(body =>
@@ -44,7 +44,7 @@ export const register = (
       ),
       TE.chain(dto => tryInsertUser(dto, env.pool))
    )
-}
+
 const tryInsertUser = (
    dto: InsertUserDTO,
    pool: Pool

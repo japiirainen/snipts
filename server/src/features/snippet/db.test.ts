@@ -38,6 +38,10 @@ describe('snippets db test suite', () => {
             )
          )
       )
+      expect(res.content).toBe('array.sort()')
+      expect(res.creator).toBe(testSnippet.creator.toString())
+      expect(res.description).toBe('how to sort an array')
+      expect(res.title).toBe('new snippet')
       expect(res.id).toBeDefined()
    })
 
@@ -63,7 +67,7 @@ describe('snippets db test suite', () => {
       )
       res.forEach(snip => {
          expect(snip.content).toBe('array.sort()')
-         expect(parseInt(snip.creator)).toBe(1)
+         expect(snip.creator).toBe('1')
          expect(snip.description).toBe('how to sort an array')
          expect(snip.title).toBe('new snippet')
       })
@@ -108,7 +112,7 @@ describe('snippets db test suite', () => {
 
       expect(snippet.id).toBe(id)
       expect(snippet.content).toBe('array.sort()')
-      expect(parseInt(snippet.creator)).toBe(1)
+      expect(snippet.creator).toBe('1')
       expect(snippet.description).toBe('how to sort an array')
       expect(snippet.title).toBe('new snippet')
    })
@@ -152,7 +156,7 @@ describe('snippets db test suite', () => {
       )
       snippets.forEach(s => {
          expect(s.content).toBe('array.sort()')
-         expect(parseInt(s.creator)).toBe(testSnippet.creator)
+         expect(s.creator).toBe(testSnippet.creator.toString())
          expect(s.description).toBe('how to sort an array')
          expect(s.title).toBe('new snippet')
       })

@@ -18,11 +18,11 @@ export interface InsertSnippetDTO {
 export const insertSnippet = (
    dto: InsertSnippetDTO,
    pool: Pool
-): TE.TaskEither<DBError, O.Option<{ id: Id<Snippet> }>> =>
+): TE.TaskEither<DBError, O.Option<Snippet>> =>
    withConn(pool, conn =>
       conn
          .query(
-            'INSERT INTO snippets (title, creator, description, content) VALUES ($1, $2, $3, $4) RETURNING id',
+            'INSERT INTO snippets (title, creator, description, content) VALUES ($1, $2, $3, $4) RETURNING *',
             [dto.title, dto.creator, dto.description, dto.content]
          )
          .then(res => A.head(res.rows))
