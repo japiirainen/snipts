@@ -24,14 +24,9 @@ const createApp = async () => {
     }))
         .use(express_1.default.json())
         .use(cookie_parser_1.default())
-        .get('/health', (_, res) => {
-        if (pool) {
-            res.status(200).json({ status: 'healthy' });
-        }
-        else {
-            res.status(503).json({ status: 'unavailable' });
-        }
-    })
+        .get('/health', (_, res) => pool
+        ? res.status(200).json({ status: 'healthy' })
+        : res.status(503).json({ status: 'unavailable' }))
         .use(env_1.initializeEnv(pool))
         .get('/me', authMiddleware_1.requireUser, authRoutes_1.authRoutes.me)
         .post('/login', authRoutes_1.authRoutes.login)

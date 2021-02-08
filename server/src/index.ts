@@ -4,12 +4,13 @@ import express, { Express } from 'express'
 import morgan from 'morgan'
 import { requireUser } from './features/auth/authMiddleware'
 import { authRoutes } from './features/auth/authRoutes'
+import { snippetRoutes } from './features/snippet/snippetRouter'
 import { config } from './infrastructure/config'
 import { createDbPool } from './infrastructure/db'
 import { initializeEnv } from './infrastructure/env'
 import { logger } from './infrastructure/logger'
 
-const createApp = async (): Promise<Express> => {
+export const createApp = async (): Promise<Express> => {
    const prerequisites = [createDbPool(), Promise.resolve()] as const
    const [pool] = await Promise.all(prerequisites)
    const app = express()
@@ -29,11 +30,15 @@ const createApp = async (): Promise<Express> => {
             : res.status(503).json({ status: 'unavailable' })
       )
       .use(initializeEnv(pool))
+      // ? Auth
       .get('/me', requireUser, authRoutes.me)
       .post('/login', authRoutes.login)
       .post('/logout', requireUser, authRoutes.logout)
       .post('/register', authRoutes.register)
       .post('/refresh-token', authRoutes.refreshToken)
+      // ? Snippets
+      .get('/snippets', snippetRoutes.all)
+      .post('/snippet', snippetRoutes.new)
 
    return app
 }

@@ -42,9 +42,7 @@ const RegisterBody = I.interface({
     email: I.string,
     password: I.string,
 });
-const register = (env, rawBody) => {
-    return function_1.pipe(TE.fromEither(function_1.pipe(RegisterBody.decode(rawBody), Either_1.mapLeft(_ => new error_1.InvalidRequest()))), TE.chain(body => function_1.pipe(validateBody(body), TE.fromOption(() => new error_1.ValidationFailed()))), TE.chain(dto => tryInsertUser(dto, env.pool)));
-};
+const register = (env, rawBody) => function_1.pipe(TE.fromEither(function_1.pipe(RegisterBody.decode(rawBody), Either_1.mapLeft(() => new error_1.InvalidRequest()))), TE.chain(body => function_1.pipe(validateBody(body), TE.fromOption(() => new error_1.ValidationFailed()))), TE.chain(dto => tryInsertUser(dto, env.pool)));
 exports.register = register;
 const tryInsertUser = (dto, pool) => function_1.pipe(userRepo_1.findUserByEmail(dto.email, pool), TE.alt(() => userRepo_1.findUserByUsername(dto.password, pool)), TE.chain(maybeUser => function_1.pipe(maybeUser, O.fold(() => TE.right(maybeUser), () => TE.left(new UserAlreadyExists())))), TE.chain(() => bcrypt_1.hashPassword(dto.password)), TE.chain(hashedPassword => userRepo_1.insertUser({ ...dto, password: hashedPassword }, pool)));
 const validateBody = (body) => function_1.pipe(O.of(body), O.filter(x => x.username.length >= 2), O.filter(x => x.username.length < 99), O.filter(x => x.email.includes('@')), O.filter(x => x.password.length >= 6), O.map(x => ({ username: x.username, password: x.password, email: x.email })));

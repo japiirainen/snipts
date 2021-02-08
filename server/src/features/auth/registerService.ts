@@ -1,8 +1,8 @@
 import { pipe } from 'fp-ts/function'
-import { mapLeft } from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/Option'
 import * as TE from 'fp-ts/TaskEither'
 import * as I from 'io-ts'
+import * as E from 'fp-ts/Either'
 import { Pool } from 'pg'
 import { CustomError } from 'ts-custom-error'
 import { BcryptError, hashPassword } from '../../infrastructure/bcrypt'
@@ -33,7 +33,7 @@ export const register = (
       TE.fromEither(
          pipe(
             RegisterBody.decode(rawBody),
-            mapLeft(() => new InvalidRequest())
+            E.mapLeft(() => new InvalidRequest())
          )
       ),
       TE.chain(body =>
