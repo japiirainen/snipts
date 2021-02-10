@@ -36,7 +36,7 @@ export const createApp = async (): Promise<Express> => {
       .post('/refresh-token', authRoutes.refreshToken)
       // ? Snippets
       .get('/snippets', snippetRoutes.all)
-      .post('/snippet', snippetRoutes.new)
+      .post('/snippet', requireUser, snippetRoutes.new)
 
    return app
 }

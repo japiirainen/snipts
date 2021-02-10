@@ -20,6 +20,7 @@ class NoSnippetsError extends CustomError implements ApplicationError {
 const NewSnippetBody = I.interface({
    title: I.string,
    description: I.string,
+   creator: I.number,
    content: I.string,
 })
 
@@ -36,7 +37,7 @@ export const newSnippet = (
             mapLeft(() => new InvalidRequest())
          )
       ),
-      TE.chain(newPost => insertSnippet({ ...newPost, creator: env.user.id }, env.pool)),
+      TE.chain(newPost => insertSnippet(newPost, env.pool)),
       TE.chain(TE.fromOption(() => new DBError()))
    )
 

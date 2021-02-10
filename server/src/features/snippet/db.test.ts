@@ -4,6 +4,7 @@ import { Pool } from 'pg'
 import { pipe, identity } from 'fp-ts/function'
 import * as E from 'fp-ts/Either'
 import * as O from 'fp-ts/Option'
+import { insertUser } from '../auth/userRepo'
 
 const testSnippet = {
    title: 'new snippet',
@@ -11,6 +12,16 @@ const testSnippet = {
    creator: 1,
    content: 'array.sort()',
 }
+const testUser = {
+   username: 'joona',
+   email: 'joona.piirainen@gmail.com',
+   password: 'foobar',
+}
+
+beforeAll(async () => {
+   const pool = await createDbPool()
+   insertUser(testUser, pool as Pool)()
+})
 
 describe('snippets db test suite', () => {
    it('succesfully insert a new snippet', async () => {
