@@ -1,4 +1,4 @@
-import { createDbPool, withConn } from '../../infrastructure/db'
+import { createDbPool } from '../../infrastructure/db'
 import { allSnippets, findSnippetById, insertSnippet, findSnippetsByCreator } from './snippetRepo'
 import { Pool } from 'pg'
 import { pipe, identity } from 'fp-ts/function'
@@ -11,12 +11,6 @@ const testSnippet = {
    creator: 1,
    content: 'array.sort()',
 }
-
-afterAll(async done => {
-   const pool = await createDbPool()
-   await withConn(pool as Pool, conn => conn.query('TRUNCATE TABLE snippets'))()
-   done()
-})
 
 describe('snippets db test suite', () => {
    it('succesfully insert a new snippet', async () => {
