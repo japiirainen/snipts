@@ -1,15 +1,17 @@
 import * as I from 'io-ts'
 import * as TE from 'fp-ts/TaskEither'
 import * as NEA from 'fp-ts/NonEmptyArray'
+import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
 import { Env } from '../../infrastructure/env'
 import { DBError } from '../../infrastructure/db'
 import { ApplicationError, InvalidRequest, ValidationFailed } from '../../infrastructure/error'
 import { Snippet } from './snippet'
-import { mapLeft } from 'fp-ts/lib/Either'
-import { insertSnippet } from './snippetRepo'
 import { CustomError } from 'ts-custom-error'
-import { allSnippets as getAllSnippets } from './snippetRepo'
+import { allSnippets as getAllSnippets, findSnippetsByCreator, insertSnippet } from './snippetRepo'
+import { Pool } from 'pg'
+import { UserNotFound } from '../auth/loginService'
+import { findUserById } from '../auth/userRepo'
 
 class NoSnippetsError extends CustomError implements ApplicationError {
    status = 400
@@ -34,7 +36,7 @@ export const newSnippet = (
       TE.fromEither(
          pipe(
             NewSnippetBody.decode(rawBody),
-            mapLeft(() => new InvalidRequest())
+            E.mapLeft(() => new InvalidRequest())
          )
       ),
       TE.chain(newPost => insertSnippet(newPost, env.pool)),
@@ -57,6 +59,57 @@ export const allSnippets = (
             snippets,
             NEA.fromArray,
             TE.fromOption(() => new NoSnippetsError())
+         )
+      )
+   )
+
+const SnippetsByCreatorBody = I.interface({
+   creator: I.number,
+})
+
+export type SnippetsByCreatorBody = I.TypeOf<typeof SnippetsByCreatorBody>
+
+export const snippetsByCreator = (
+   env: Env,
+   rawBody: unknown
+): TE.TaskEither<
+   NoSnippetsError | DBError | UserNotFound | InvalidRequest,
+   NEA.NonEmptyArray<Snippet>
+> =>
+   pipe(
+      TE.fromEither(
+         pipe(
+            SnippetsByCreatorBody.decode(rawBody),
+            E.mapLeft(() => new InvalidRequest())
+         )
+      ),
+      TE.chain(({ creator }) =>
+         pipe(
+            findUserById(creator, env.pool),
+            TE.chain(maybeUser =>
+               pipe(
+                  maybeUser,
+                  TE.fromOption(() => new UserNotFound())
+               )
+            )
+         )
+      ),
+      TE.chain(user =>
+         pipe(
+            findSnippetsByCreator(user.id, env.pool),
+            TE.chain(maybeSnippets =>
+               pipe(
+                  maybeSnippets,
+                  TE.fromOption(() => new DBError())
+               )
+            ),
+            TE.chain(snippets =>
+               pipe(
+                  snippets,
+                  NEA.fromArray,
+                  TE.fromOption(() => new NoSnippetsError())
+               )
+            )
          )
       )
    )

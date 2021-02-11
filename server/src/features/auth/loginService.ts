@@ -10,7 +10,7 @@ import { ApplicationError, InvalidRequest } from '../../infrastructure/error'
 import { generateAccessToken, generateRefreshToken } from '../../infrastructure/jwt'
 import { findUserByUsername } from './userRepo'
 
-class UserNotFound extends CustomError implements ApplicationError {
+export class UserNotFound extends CustomError implements ApplicationError {
    status = 400
    code = 'UserNotFound'
    log = true

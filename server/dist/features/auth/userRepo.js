@@ -19,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findUserByEmail = exports.findUserByUsername = exports.insertUser = void 0;
+exports.findUserById = exports.findUserByEmail = exports.findUserByUsername = exports.insertUser = void 0;
 const A = __importStar(require("fp-ts/Array"));
 const db_1 = require("../../infrastructure/db");
 const insertUser = (dto, pool) => db_1.withConn(pool, async (conn) => {
@@ -38,3 +38,5 @@ const findUserByEmail = (email, pool) => db_1.withConn(pool, conn => conn
     .query('SELECT * FROM users where email = $1 LIMIT 1', [email])
     .then(res => A.head(res.rows)));
 exports.findUserByEmail = findUserByEmail;
+const findUserById = (id, pool) => db_1.withConn(pool, conn => conn.query('SELECT * FROM users where id = $1 LIMIT 1', [id]).then(res => A.head(res.rows)));
+exports.findUserById = findUserById;

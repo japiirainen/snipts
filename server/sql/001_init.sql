@@ -17,5 +17,16 @@ CREATE TABLE snippets (
     creator BIGINT NOT NULL REFERENCES users (id),
     created_on timestamptz NOT NULL DEFAULT now()
 );
-CREATE TABLE likes();
-CREATE TABLE comments();
+CREATE TABLE likes (
+    id bigserial PRIMARY KEY,
+    snippet BIGINT NOT NULL REFERENCES snippets (id),
+    creator BIGINT NOT NULL REFERENCES users (id),
+    created_on timestamptz NOT NULL DEFAULT now(),
+    direction INT NOT NULL
+);
+CREATE TABLE comments (
+    id bigserial PRIMARY KEY,
+    snippet BIGINT NOT NULL REFERENCES snippets (id),
+    creator BIGINT NOT NULL REFERENCES users (id),
+    created_on timestamptz NOT NULL DEFAULT now()
+);
