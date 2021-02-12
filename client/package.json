@@ -1,9 +1,21 @@
 {
-   "name": "client",
-   "version": "0.0.1",
-   "license": "MIT",
-   "dependencies": {
-      "cross-env": "5.0.5",
-      "server": "0.0.1"
-   }
+  "name": "client",
+  "version": "0.0.1",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "cross-env": "5.0.5",
+    "parcel": "^1.12.4",
+    "purescript": "^0.13.8",
+    "server": "0.0.1",
+    "spago": "^0.15.3"
+  },
+  "scripts": {
+    "build": "spago build",
+    "serve": "parcel dev/index.html --open",
+    "build-prod": "mkdir -p prod && cp dev/index.html prod/ && rm -rf dist && spago bundle-app --to prod/index.js && parcel build prod/index.html"
+  },
+  "dependencies": {
+    "purty": "^6.3.1"
+  }
 }
