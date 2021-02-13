@@ -8,6 +8,7 @@ import { DBError } from '../../infrastructure/db'
 import { Env } from '../../infrastructure/env'
 import { ApplicationError, InvalidRequest } from '../../infrastructure/error'
 import { generateAccessToken, generateRefreshToken } from '../../infrastructure/jwt'
+import { User } from './user'
 import { findUserByUsername } from './userRepo'
 
 export class UserNotFound extends CustomError implements ApplicationError {
@@ -31,6 +32,7 @@ export const login = (
    {
       accessToken: string
       refreshToken: string
+      user: User
    }
 > =>
    pipe(
@@ -62,5 +64,6 @@ export const login = (
       TE.map(user => ({
          accessToken: generateAccessToken(user.username),
          refreshToken: generateRefreshToken(user.username),
+         user,
       }))
    )

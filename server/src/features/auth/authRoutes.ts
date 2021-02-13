@@ -31,9 +31,9 @@ export const authRoutes = {
       processLogin(req.env, req.body)().then(result =>
          pipe(
             result,
-            E.fold(processError(res), ({ accessToken, refreshToken }) => {
+            E.fold(processError(res), ({ accessToken, refreshToken, user }) => {
                setRefreshToken(res, refreshToken)
-               return res.json({ accessToken })
+               return res.json({ accessToken, user: toPublicUser(user) })
             })
          )
       )
@@ -43,7 +43,9 @@ export const authRoutes = {
       processRegister(req.env, req.body)().then(e =>
          pipe(
             e,
-            E.fold(processError(res), () => res.status(200).send())
+            E.fold(processError(res), ({ accessToken, user }) =>
+               res.status(200).json({ accessToken, user: toPublicUser(user) })
+            )
          )
       )
    },

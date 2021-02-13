@@ -22,13 +22,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.findUserById = exports.findUserByEmail = exports.findUserByUsername = exports.insertUser = void 0;
 const A = __importStar(require("fp-ts/Array"));
 const db_1 = require("../../infrastructure/db");
-const insertUser = (dto, pool) => db_1.withConn(pool, async (conn) => {
-    await conn.query('INSERT INTO users (username, email, password) VALUES ($1, $2, $3)', [
-        dto.username,
-        dto.email,
-        dto.password,
-    ]);
-});
+const insertUser = (dto, pool) => db_1.withConn(pool, conn => conn
+    .query('INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *', [
+    dto.username,
+    dto.email,
+    dto.password,
+])
+    .then(v => {
+    console.log(v);
+    return v;
+})
+    .then(res => A.head(res.rows)));
 exports.insertUser = insertUser;
 const findUserByUsername = (username, pool) => db_1.withConn(pool, conn => conn
     .query('SELECT * FROM users WHERE username = $1 LIMIT 1', [username])

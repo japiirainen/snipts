@@ -12,14 +12,19 @@ export interface InsertUserDTO {
    password: string
 }
 
-export const insertUser = (dto: InsertUserDTO, pool: Pool): TE.TaskEither<DBError, void> =>
-   withConn(pool, async conn => {
-      await conn.query('INSERT INTO users (username, email, password) VALUES ($1, $2, $3)', [
-         dto.username,
-         dto.email,
-         dto.password,
-      ])
-   })
+export const insertUser = (
+   dto: InsertUserDTO,
+   pool: Pool
+): TE.TaskEither<DBError, O.Option<User>> =>
+   withConn(pool, conn =>
+      conn
+         .query('INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *', [
+            dto.username,
+            dto.email,
+            dto.password,
+         ])
+         .then(res => A.head(res.rows))
+   )
 
 export const findUserByUsername = (
    username: string,

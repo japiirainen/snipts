@@ -27,8 +27,10 @@ const I = __importStar(require("io-ts"));
 const E = __importStar(require("fp-ts/Either"));
 const ts_custom_error_1 = require("ts-custom-error");
 const bcrypt_1 = require("../../infrastructure/bcrypt");
+const db_1 = require("../../infrastructure/db");
 const error_1 = require("../../infrastructure/error");
 const userRepo_1 = require("./userRepo");
+const jwt_1 = require("../../infrastructure/jwt");
 class UserAlreadyExists extends ts_custom_error_1.CustomError {
     constructor() {
         super(...arguments);
@@ -42,7 +44,10 @@ const RegisterBody = I.interface({
     email: I.string,
     password: I.string,
 });
-const register = (env, rawBody) => function_1.pipe(TE.fromEither(function_1.pipe(RegisterBody.decode(rawBody), E.mapLeft(() => new error_1.InvalidRequest()))), TE.chain(body => function_1.pipe(validateBody(body), TE.fromOption(() => new error_1.ValidationFailed()))), TE.chain(dto => tryInsertUser(dto, env.pool)));
+const register = (env, rawBody) => function_1.pipe(TE.fromEither(function_1.pipe(RegisterBody.decode(rawBody), E.mapLeft(() => new error_1.InvalidRequest()))), TE.chain(body => function_1.pipe(validateBody(body), TE.fromOption(() => new error_1.ValidationFailed()))), TE.chain(dto => tryInsertUser(dto, env.pool)), TE.chain(maybeUser => function_1.pipe(maybeUser, TE.fromOption(() => new db_1.DBError()))), TE.map(user => ({
+    accessToken: jwt_1.generateAccessToken(user.username),
+    user: user,
+})));
 exports.register = register;
 const tryInsertUser = (dto, pool) => function_1.pipe(userRepo_1.findUserByEmail(dto.email, pool), TE.alt(() => userRepo_1.findUserByUsername(dto.password, pool)), TE.chain(maybeUser => function_1.pipe(maybeUser, O.fold(() => TE.right(maybeUser), () => TE.left(new UserAlreadyExists())))), TE.chain(() => bcrypt_1.hashPassword(dto.password)), TE.chain(hashedPassword => userRepo_1.insertUser({ ...dto, password: hashedPassword }, pool)));
 const validateBody = (body) => function_1.pipe(O.of(body), O.filter(x => x.username.length >= 2), O.filter(x => x.username.length < 99), O.filter(x => x.email.includes('@')), O.filter(x => x.password.length >= 6), O.map(x => ({ username: x.username, password: x.password, email: x.email })));

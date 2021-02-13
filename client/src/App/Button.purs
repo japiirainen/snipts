@@ -1,15 +1,16 @@
 module App.Button where
 
 import Prelude
-
 import Data.Maybe (Maybe(..))
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 
-type State = { count :: Int }
+type State
+  = { count :: Int }
 
-data Action = Increment
+data Action
+  = Increment
 
 component :: forall q i o m. H.Component HH.HTML q i o m
 component =
@@ -23,7 +24,8 @@ render :: forall cs m. State -> H.ComponentHTML Action cs m
 render state =
   HH.div_
     [ HH.p_
-        [ HH.text $ "You clicked " <> show state.count <> " times" ]
+        [ HH.text $ "You clicked " <> show state.count <> " times"
+        ]
     , HH.button
         [ HE.onClick \_ -> Just Increment ]
         [ HH.text "Click me" ]
@@ -31,5 +33,4 @@ render state =
 
 handleAction :: forall cs o m. Action → H.HalogenM State Action cs o m Unit
 handleAction = case _ of
-  Increment ->
-      H.modify_ \st -> st { count = st.count + 1 }
+  Increment -> H.modify_ \st -> st { count = st.count + 1 }

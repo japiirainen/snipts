@@ -10,6 +10,8 @@ import { DBError } from '../../infrastructure/db'
 import { Env } from '../../infrastructure/env'
 import { ApplicationError, InvalidRequest, ValidationFailed } from '../../infrastructure/error'
 import { findUserByEmail, findUserByUsername, insertUser, InsertUserDTO } from './userRepo'
+import { User } from './user'
+import { generateAccessToken } from '../../infrastructure/jwt'
 
 class UserAlreadyExists extends CustomError implements ApplicationError {
    status = 400
@@ -28,7 +30,10 @@ type RegisterBodyT = I.TypeOf<typeof RegisterBody>
 export const register = (
    env: Env,
    rawBody: unknown
-): TE.TaskEither<DBError | ValidationFailed | InvalidRequest, void> =>
+): TE.TaskEither<
+   DBError | ValidationFailed | InvalidRequest,
+   { accessToken: string; user: User }
+> =>
    pipe(
       TE.fromEither(
          pipe(
@@ -42,13 +47,23 @@ export const register = (
             TE.fromOption(() => new ValidationFailed())
          )
       ),
-      TE.chain(dto => tryInsertUser(dto, env.pool))
+      TE.chain(dto => tryInsertUser(dto, env.pool)),
+      TE.chain(maybeUser =>
+         pipe(
+            maybeUser,
+            TE.fromOption(() => new DBError())
+         )
+      ),
+      TE.map(user => ({
+         accessToken: generateAccessToken(user.username),
+         user: user,
+      }))
    )
 
 const tryInsertUser = (
    dto: InsertUserDTO,
    pool: Pool
-): TE.TaskEither<DBError | UserAlreadyExists | BcryptError, void> =>
+): TE.TaskEither<DBError | UserAlreadyExists | BcryptError, O.Option<User>> =>
    pipe(
       findUserByEmail(dto.email, pool),
       TE.alt(() => findUserByUsername(dto.password, pool)),
