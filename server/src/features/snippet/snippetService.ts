@@ -8,8 +8,7 @@ import { DBError } from '../../infrastructure/db'
 import { ApplicationError, InvalidRequest, ValidationFailed } from '../../infrastructure/error'
 import { Snippet } from './snippet'
 import { CustomError } from 'ts-custom-error'
-import { allSnippets as getAllSnippets, findSnippetsByCreator, insertSnippet } from './snippetRepo'
-import { Pool } from 'pg'
+import { allSnippets as getAllSnippets, findSnippetsByAuthor, insertSnippet } from './snippetRepo'
 import { UserNotFound } from '../auth/loginService'
 import { findUserById } from '../auth/userRepo'
 
@@ -22,7 +21,7 @@ class NoSnippetsError extends CustomError implements ApplicationError {
 const NewSnippetBody = I.interface({
    title: I.string,
    description: I.string,
-   creator: I.number,
+   author: I.number,
    content: I.string,
 })
 
@@ -63,13 +62,13 @@ export const allSnippets = (
       )
    )
 
-const SnippetsByCreatorBody = I.interface({
-   creator: I.number,
+const SnippetsByAuthorBody = I.interface({
+   author: I.number,
 })
 
-export type SnippetsByCreatorBody = I.TypeOf<typeof SnippetsByCreatorBody>
+export type SnippetsByAuthorBody = I.TypeOf<typeof SnippetsByAuthorBody>
 
-export const snippetsByCreator = (
+export const snippetsByAuthor = (
    env: Env,
    rawBody: unknown
 ): TE.TaskEither<
@@ -79,13 +78,13 @@ export const snippetsByCreator = (
    pipe(
       TE.fromEither(
          pipe(
-            SnippetsByCreatorBody.decode(rawBody),
+            SnippetsByAuthorBody.decode(rawBody),
             E.mapLeft(() => new InvalidRequest())
          )
       ),
-      TE.chain(({ creator }) =>
+      TE.chain(({ author }) =>
          pipe(
-            findUserById(creator, env.pool),
+            findUserById(author, env.pool),
             TE.chain(maybeUser =>
                pipe(
                   maybeUser,
@@ -96,7 +95,7 @@ export const snippetsByCreator = (
       ),
       TE.chain(user =>
          pipe(
-            findSnippetsByCreator(user.id, env.pool),
+            findSnippetsByAuthor(user.id, env.pool),
             TE.chain(maybeSnippets =>
                pipe(
                   maybeSnippets,

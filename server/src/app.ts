@@ -37,7 +37,7 @@ export const createApp = async (): Promise<Express> => {
       // ? Snippets
       .get('/snippet', snippetRoutes.all)
       .post('/snippet', requireUser, snippetRoutes.new)
-      .get('/creator/snippets', snippetRoutes.allByCreator)
+      .get('/author/snippets', snippetRoutes.allByauthor)
 
    return app
 }

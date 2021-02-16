@@ -28,10 +28,6 @@ const insertUser = (dto, pool) => db_1.withConn(pool, conn => conn
     dto.email,
     dto.password,
 ])
-    .then(v => {
-    console.log(v);
-    return v;
-})
     .then(res => A.head(res.rows)));
 exports.insertUser = insertUser;
 const findUserByUsername = (username, pool) => db_1.withConn(pool, conn => conn

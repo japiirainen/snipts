@@ -7,7 +7,7 @@ describe('Snippet routes test suite', () => {
       const reqBody = {
          title: 'new snippet',
          description: 'how to sort an array',
-         creator: 1,
+         author: 1,
          content: 'array.sort()',
       }
       const { body, status } = await request(app).post('/snippet').send(reqBody)
@@ -16,7 +16,7 @@ describe('Snippet routes test suite', () => {
       expect(body.snippet).toBeDefined()
       expect(body.snippet.title).toBe('new snippet')
       expect(body.snippet.description).toBe('how to sort an array')
-      expect(body.snippet.creator).toBe('1')
+      expect(body.snippet.author).toBe('1')
       expect(body.snippet.content).toBe('array.sort()')
    })
 })

@@ -1,5 +1,5 @@
 import { createDbPool } from '../../infrastructure/db'
-import { allSnippets, findSnippetById, insertSnippet, findSnippetsByCreator } from './snippetRepo'
+import { allSnippets, findSnippetById, insertSnippet, findSnippetsByAuthor } from './snippetRepo'
 import { Pool } from 'pg'
 import { pipe, identity } from 'fp-ts/function'
 import * as E from 'fp-ts/Either'
@@ -9,7 +9,7 @@ import { insertUser } from '../auth/userRepo'
 const testSnippet = {
    title: 'new snippet',
    description: 'how to sort an array',
-   creator: 1,
+   author: 1,
    content: 'array.sort()',
 }
 const testUser = {
@@ -44,7 +44,7 @@ describe('snippets db test suite', () => {
          )
       )
       expect(res.content).toBe('array.sort()')
-      expect(res.creator).toBe(testSnippet.creator.toString())
+      expect(res.author).toBe(testSnippet.author.toString())
       expect(res.description).toBe('how to sort an array')
       expect(res.title).toBe('new snippet')
       expect(res.id).toBeDefined()
@@ -72,7 +72,7 @@ describe('snippets db test suite', () => {
       )
       res.forEach(snip => {
          expect(snip.content).toBe('array.sort()')
-         expect(snip.creator).toBe('1')
+         expect(snip.author).toBe('1')
          expect(snip.description).toBe('how to sort an array')
          expect(snip.title).toBe('new snippet')
       })
@@ -117,12 +117,12 @@ describe('snippets db test suite', () => {
 
       expect(snippet.id).toBe(id)
       expect(snippet.content).toBe('array.sort()')
-      expect(snippet.creator).toBe('1')
+      expect(snippet.author).toBe('1')
       expect(snippet.description).toBe('how to sort an array')
       expect(snippet.title).toBe('new snippet')
    })
 
-   it('find all snippets by a creator', async () => {
+   it('find all snippets by a author', async () => {
       const pool = await createDbPool()
       await insertSnippet(testSnippet, pool as Pool)().then(res =>
          pipe(
@@ -142,7 +142,7 @@ describe('snippets db test suite', () => {
          )
       )
 
-      const snippets = await findSnippetsByCreator(testSnippet.creator, pool as Pool)().then(res =>
+      const snippets = await findSnippetsByAuthor(testSnippet.author, pool as Pool)().then(res =>
          pipe(
             res,
             E.fold(
@@ -161,7 +161,7 @@ describe('snippets db test suite', () => {
       )
       snippets.forEach(s => {
          expect(s.content).toBe('array.sort()')
-         expect(s.creator).toBe(testSnippet.creator.toString())
+         expect(s.author).toBe(testSnippet.author.toString())
          expect(s.description).toBe('how to sort an array')
          expect(s.title).toBe('new snippet')
       })
