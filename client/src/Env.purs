@@ -2,13 +2,14 @@ module App.Env where
 
 import Prelude
 import App.Data.Profile (Profile)
+import App.Api.Request (BaseURL)
 import Data.Maybe (Maybe)
 import Effect.Aff.Bus (BusRW)
 import Effect.Ref (Ref)
 
 type Env
   = { logLevel :: LogLevel
-    , baseUrl :: baseURL
+    , baseUrl :: BaseURL
     , userEnv :: UserEnv
     }
 
