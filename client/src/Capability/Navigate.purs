@@ -13,6 +13,6 @@ class
   navigate :: Route -> m Unit
   logout :: m Unit
 
-instance navigateHalogenM :: Navigate m => Navigate (HalogenM st act msg m) where
+instance navigateHalogenM :: Navigate m => Navigate (HalogenM st act slots msg m) where
   navigate = lift <<< navigate
   logout = lift logout
