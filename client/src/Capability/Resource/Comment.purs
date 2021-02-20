@@ -8,11 +8,11 @@ import Slug (Slug)
 
 class
   Monad m <= ManageComment m where
-  getComment :: Slug -> m (Maybe (Array Comment))
+  getComments :: Slug -> m (Maybe (Array Comment))
   createComment :: Slug -> String -> m Unit
   deleteComment :: Slug -> CommentId -> m Unit
 
 instance manageCommentHalogenM :: ManageComment m => ManageComment (HalogenM st act cs msg m) where
-  getComment = lift <<< getComment
+  getComments = lift <<< getComments
   createComment s = lift <<< createComment s
   deleteComment s = lift <<< deleteComment s

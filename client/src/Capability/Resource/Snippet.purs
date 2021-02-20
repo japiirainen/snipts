@@ -1,4 +1,4 @@
-module App.Capability.Resource.Comment where
+module App.Capability.Resource.Snippet where
 
 import Prelude
 import App.Api.Endpoint (Pagination, SnippetParams)

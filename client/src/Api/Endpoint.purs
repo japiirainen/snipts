@@ -61,8 +61,8 @@ endpointCodec =
         , "Users": "users" / noArgs
         , "Follow": "profiles" / uname segment / "follow"
         , "Snippet": "snippets" / slug segment
-        , "Comment": "articles" / slug segment / "comments" / commentId
-        , "Comments": "articles" / slug segment / "comments"
+        , "Comment": "snippets" / slug segment / "comments" / commentId
+        , "Comments": "snippets" / slug segment / "comments"
         , "Like": "like" / slug segment / "like"
         -- automatically create query parameters
         , "Snippets":
