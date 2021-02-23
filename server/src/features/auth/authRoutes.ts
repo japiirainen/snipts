@@ -4,6 +4,7 @@ import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
 import { processError } from '../../infrastructure/error'
 import { register as processRegister } from './registerService'
+import { allUsers } from './userService'
 import { login as processLogin } from './loginService'
 import { toPublicUser } from './user'
 import ms from 'ms'
@@ -66,5 +67,14 @@ export const authRoutes = {
    logout(_: Request, res: Response): void {
       setRefreshToken(res, '')
       res.status(200).send()
+   },
+
+   users(req: Request, res: Response): void {
+      allUsers(req.env)().then(r =>
+         pipe(
+            r,
+            E.fold(processError(res), ({ users }) => res.status(200).json({ users }))
+         )
+      )
    },
 }

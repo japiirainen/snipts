@@ -11,11 +11,13 @@ export interface User {
 export interface PublicUser {
    id: Id<User>
    username: string
+   email: string
    createdOn: string
 }
 
 export const toPublicUser = (user: User): PublicUser => ({
    id: user.id,
    username: user.username,
+   email: user.email,
    createdOn: user.created_on,
 })

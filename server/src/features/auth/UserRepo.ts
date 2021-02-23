@@ -42,11 +42,14 @@ export const findUserByEmail = (
 ): TE.TaskEither<DBError, O.Option<User>> =>
    withConn(pool, conn =>
       conn
-         .query('SELECT * FROM users where email = $1 LIMIT 1', [email])
+         .query('SELECT * FROM users WHERE email = $1 LIMIT 1', [email])
          .then(res => A.head(res.rows))
    )
 
 export const findUserById = (id: Id<User>, pool: Pool): TE.TaskEither<DBError, O.Option<User>> =>
    withConn(pool, conn =>
-      conn.query('SELECT * FROM users where id = $1 LIMIT 1', [id]).then(res => A.head(res.rows))
+      conn.query('SELECT * FROM users WHERE id = $1 LIMIT 1', [id]).then(res => A.head(res.rows))
    )
+
+export const allUsers = (pool: Pool): TE.TaskEither<DBError, O.Option<Array<User>>> =>
+   withConn(pool, conn => conn.query('SELECT * FROM users').then(res => O.fromNullable(res.rows)))

@@ -29,7 +29,8 @@ export const createApp = async (): Promise<Express> => {
       )
       .use(initializeEnv(pool))
       // ? Auth
-      .get('/me', requireUser, authRoutes.me)
+      .get('/user', requireUser, authRoutes.me)
+      .get('/users', authRoutes.users)
       .post('/login', authRoutes.login)
       .post('/logout', requireUser, authRoutes.logout)
       .post('/register', authRoutes.register)
