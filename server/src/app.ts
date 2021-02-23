@@ -13,6 +13,26 @@ export const createApp = async (): Promise<Express> => {
    const [pool] = await Promise.all(prerequisites)
    const app = express()
 
+   const v1Routes = express.Router()
+   v1Routes
+      // ? Auth
+      .get('/user', requireUser, authRoutes.me)
+      .get('/users', authRoutes.users)
+      .post('/login', authRoutes.login)
+      .post('/logout', requireUser, authRoutes.logout)
+      .post('/register', authRoutes.register)
+      .post('/refresh-token', authRoutes.refreshToken)
+      // ? Snippets
+      .get('/snippet', snippetRoutes.all)
+      .post('/snippet', requireUser, snippetRoutes.new)
+      .get('/author/snippets', snippetRoutes.allByauthor)
+      // ? Profile
+      .post('/profile/:uname/follow')
+      .delete('/profile/:uname/follow')
+      .get('/profile/:uname')
+      // ? Tags
+      .get('/tags')
+
    app.use(morgan('dev'))
       .use(
          cors({
@@ -28,17 +48,7 @@ export const createApp = async (): Promise<Express> => {
             : res.status(503).json({ status: 'unavailable' })
       )
       .use(initializeEnv(pool))
-      // ? Auth
-      .get('/user', requireUser, authRoutes.me)
-      .get('/users', authRoutes.users)
-      .post('/login', authRoutes.login)
-      .post('/logout', requireUser, authRoutes.logout)
-      .post('/register', authRoutes.register)
-      .post('/refresh-token', authRoutes.refreshToken)
-      // ? Snippets
-      .get('/snippet', snippetRoutes.all)
-      .post('/snippet', requireUser, snippetRoutes.new)
-      .get('/author/snippets', snippetRoutes.allByauthor)
+      .use('/api', v1Routes)
 
    return app
 }
