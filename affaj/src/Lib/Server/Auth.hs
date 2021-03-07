@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveAnyClass #-}
+
 module Lib.Server.Auth
   ( -- * API
     LoginRequest (..),
@@ -31,7 +33,7 @@ data LoginRequest = LoginRequest
     loginRequestPassword :: PasswordPlainText
   }
   deriving (Generic, Show, Eq)
-  deriving (FromJSON, ToJSON)
+  deriving anyclass (FromJSON, ToJSON)
 
 newtype LoginResponse = LoginResponse
   { loginResponseToken :: JwtToken

@@ -1,46 +1,45 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
 module Lib.App.Error
-       ( AppError (..)
-       , AppErrorType
-       , AppException (..)
-       , WithError
-       , throwError
-       , toHttpError
+  ( AppError (..),
+    AppErrorType,
+    AppException (..),
+    WithError,
+    throwError,
+    toHttpError,
 
-         -- * Error checks
-       , isServerError
-       , isNotAllowed
-       , isInvalid
+    -- * Error checks
+    isServerError,
+    isNotAllowed,
+    isInvalid,
 
-         -- * Internal error helpers
-       , notFound
-       , serverError
-       , notAllowed
-       , invalid
-       , missingHeader
-       , headerDecodeError
-       , dbError
-       , dbNamedError
-       , limitError
+    -- * Internal error helpers
+    notFound,
+    serverError,
+    notAllowed,
+    invalid,
+    missingHeader,
+    headerDecodeError,
+    dbError,
+    dbNamedError,
+    limitError,
 
-         -- * Error throwing helpers
-       , throwOnNothing
-       , throwOnNothingM
-       , notFoundOnNothing
-       , notFoundOnNothingM
-       ) where
+    -- * Error throwing helpers
+    throwOnNothing,
+    throwOnNothingM,
+    notFoundOnNothing,
+    notFoundOnNothingM,
+  )
+where
 
-import PgNamed (PgNamedError)
 import Control.Monad.Except (MonadError)
+import qualified Control.Monad.Except as E (throwError)
 import Data.CaseInsensitive (foldedCase)
 import GHC.Stack (SrcLoc (SrcLoc, srcLocModule, srcLocStartLine))
 import Network.HTTP.Types.Header (HeaderName)
+import PgNamed (PgNamedError)
 import Servant.Server (err401, err404, err413, err417, err500, errBody)
-
-import qualified Control.Monad.Except as E (throwError)
 import qualified Servant.Server as Servant (ServerError)
-
 
 -- | Type alias for errors.
 type WithError m = (MonadError AppError m, HasCallStack)
@@ -51,7 +50,7 @@ throwError = E.throwError . AppError (toSourcePosition callStack)
 {-# INLINE throwError #-}
 
 newtype SourcePosition = SourcePosition Text
-    deriving newtype (Show, Eq)
+  deriving newtype (Show, Eq)
 
 -- | Display 'CallStack' as 'SourcePosition' in a format: @Module.function#line_number@.
 toSourcePosition :: CallStack -> SourcePosition
@@ -59,82 +58,78 @@ toSourcePosition cs = SourcePosition showCallStack
   where
     showCallStack :: Text
     showCallStack = case getCallStack cs of
-        []                             -> "<unknown loc>"
-        [(name, loc)]                  -> showLoc name loc
-        (_, loc) : (callerName, _) : _ -> showLoc callerName loc
+      [] -> "<unknown loc>"
+      [(name, loc)] -> showLoc name loc
+      (_, loc) : (callerName, _) : _ -> showLoc callerName loc
 
     showLoc :: String -> SrcLoc -> Text
-    showLoc name SrcLoc{..} =
-        toText srcLocModule <> "." <> toText name <> "#" <> show srcLocStartLine
+    showLoc name SrcLoc {..} =
+      toText srcLocModule <> "." <> toText name <> "#" <> show srcLocStartLine
 
-{- | Exception wrapper around 'AppError'. Useful when you need to throw/catch
-'AppError' as 'Exception'.
--}
+-- | Exception wrapper around 'AppError'. Useful when you need to throw/catch
+-- 'AppError' as 'Exception'.
 newtype AppException = AppException
-    { unAppException :: AppError
-    } deriving (Show)
-      deriving anyclass (Exception)
+  { unAppException :: AppError
+  }
+  deriving (Show)
+  deriving anyclass (Exception)
 
 -- | 'AppErrorType' with the corresponding 'CallStack'.
 data AppError = AppError
-    { appErrorCallStack :: !SourcePosition
-    , appErrorType      :: !AppErrorType
-    } deriving (Show, Eq)
+  { appErrorCallStack :: !SourcePosition,
+    appErrorType :: !AppErrorType
+  }
+  deriving (Show, Eq)
 
 -- | App errors type.
 newtype AppErrorType = InternalError IError
-    deriving (Show, Eq)
+  deriving (Show, Eq)
 
-{- | The internal errors that can be thrown. These errors are meant to be
-handled within the application and cover exceptional circumstances/coding errors.
--}
+-- | The internal errors that can be thrown. These errors are meant to be
+-- handled within the application and cover exceptional circumstances/coding errors.
 data IError
-    {- | General not found. -}
-    = NotFound
-    {- | Some exceptional circumstance has happened stop execution and return.
-    Optional text to provide some context in server logs.
-    -}
-    | ServerError Text
-    {- | A required permission level was not met. Optional text to provide some context. -}
-    | NotAllowed Text
-    {- | Given inputs do not conform to the expected format or shape. Optional
-    text to provide some context in server logs.
-    -}
-    | Invalid Text
-    {- | Some header expected, but not present in header list.
-    -}
-    | MissingHeader HeaderName
-    {- | An authentication header that was required was provided but not in a
-    format that the server can understand
-    -}
-    | HeaderDecodeError Text
-    -- | Data base specific errors.
-    | DbError Text
-    -- | Data base named parameters errors.
-    | DbNamedError PgNamedError
-    -- | Limits on the multi-request are overflowed.
-    | LimitError
-    deriving (Show, Eq)
+  = -- | General not found.
+    NotFound
+  | -- | Some exceptional circumstance has happened stop execution and return.
+    --    Optional text to provide some context in server logs.
+    ServerError Text
+  | -- | A required permission level was not met. Optional text to provide some context.
+    NotAllowed Text
+  | -- | Given inputs do not conform to the expected format or shape. Optional
+    --    text to provide some context in server logs.
+    Invalid Text
+  | -- | Some header expected, but not present in header list.
+    MissingHeader HeaderName
+  | -- | An authentication header that was required was provided but not in a
+    --    format that the server can understand
+    HeaderDecodeError Text
+  | -- | Data base specific errors.
+    DbError Text
+  | -- | Data base named parameters errors.
+    DbNamedError PgNamedError
+  | -- | Limits on the multi-request are overflowed.
+    LimitError
+  deriving (Show, Eq)
 
 -- | Map 'AppError' into a HTTP error code.
 toHttpError :: AppError -> Servant.ServerError
 toHttpError (AppError _callStack errorType) = case errorType of
-    InternalError err -> case err of
-        NotFound               -> err404
-        ServerError msg        -> err500 { errBody = encodeUtf8 msg }
-        NotAllowed msg         -> err401 { errBody = encodeUtf8 msg }
-        Invalid msg            -> err417 { errBody = encodeUtf8 msg }
-        MissingHeader name     -> err401 { errBody = toLazy $ "Header not found: " <> foldedCase name }
-        HeaderDecodeError name -> err401 { errBody = encodeUtf8 $ "Unable to decode header: " <> name }
-        DbError e              -> err500 { errBody = encodeUtf8 e }
-        DbNamedError e         -> err500 { errBody = show e }
-        LimitError             -> err413 { errBody = "Request is over the limits"}
+  InternalError err -> case err of
+    NotFound -> err404
+    ServerError msg -> err500 {errBody = encodeUtf8 msg}
+    NotAllowed msg -> err401 {errBody = encodeUtf8 msg}
+    Invalid msg -> err417 {errBody = encodeUtf8 msg}
+    MissingHeader name -> err401 {errBody = toLazy $ "Header not found: " <> foldedCase name}
+    HeaderDecodeError name -> err401 {errBody = encodeUtf8 $ "Unable to decode header: " <> name}
+    DbError e -> err500 {errBody = encodeUtf8 e}
+    DbNamedError e -> err500 {errBody = show e}
+    LimitError -> err413 {errBody = "Request is over the limits"}
+
 --    MobileAppError err -> let errMsg = Proto.ErrorResponse err mempty in
 --        err400 { errBody = fromStrict $ encodeMessage errMsg }
 --    ExternalError err -> case err of
 --        ClientError e -> clientErrortoServantErr e
 --        -- _             -> err400 { errBody = "External error" }
-
 
 -- clientErrortoServantErr :: ServantError -> Servant.ServerError
 -- clientErrortoServantErr = \case
@@ -160,15 +155,15 @@ toHttpError (AppError _callStack errorType) = case errorType of
 
 isServerError :: AppErrorType -> Bool
 isServerError (InternalError (ServerError _)) = True
-isServerError _                               = False
+isServerError _ = False
 
 isNotAllowed :: AppErrorType -> Bool
 isNotAllowed (InternalError (NotAllowed _)) = True
-isNotAllowed _                              = False
+isNotAllowed _ = False
 
 isInvalid :: AppErrorType -> Bool
 isInvalid (InternalError (Invalid _)) = True
-isInvalid _                           = False
+isInvalid _ = False
 
 ----------------------------------------------------------------------------
 -- Internal Error helpers

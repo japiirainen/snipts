@@ -44,7 +44,6 @@ common common-options
                        DeriveGeneric
                        DerivingStrategies
                        DerivingVia
-                       DeriveAnyClass
                        FlexibleContexts
                        FlexibleInstances
                        GeneralizedNewtypeDeriving
