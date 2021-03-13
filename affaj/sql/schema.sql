@@ -9,5 +9,15 @@ CREATE TABLE IF NOT EXISTS users (
   pwd_hash TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
+CREATE TABLE IF NOT EXISTS snippets (
+  id TEXT NOT NULL,
+  title text NOT NULL,
+  description text NOT NULL,
+  content text NOT NULL,
+  author BIGINT NOT NULL REFERENCES users (id),
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
 ALTER TABLE ONLY users
 ADD CONSTRAINT pk_users PRIMARY KEY (id);
+ALTER TABLE ONLY snippets
+ADD CONSTRAINT pk_snippets PRIMARY KEY (id);

@@ -3,12 +3,13 @@
 -- | SQL queries to work with the @users@ table.
 module Lib.Db.User
   ( getUserByEmail,
+    createUser,
   )
 where
 
 import Lib.App (WithError)
 import Lib.Core.Email (Email)
-import Lib.Core.User (User)
+import Lib.Core.User (NewUser (..), User)
 import Lib.Db.Functions (WithDb, asSingleRow, queryNamed)
 
 getUserByEmail :: (WithDb env m, WithError m) => Email -> m User
@@ -21,3 +22,6 @@ getUserByEmail email =
     WHERE email = LOWER(?email)
 |]
       ["email" =? email]
+
+createUser :: (WithDb env m, WithError m) => NewUser -> m User
+createUser newUser@NewUser {..} = undefined

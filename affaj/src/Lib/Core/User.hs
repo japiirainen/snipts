@@ -2,6 +2,7 @@
 
 module Lib.Core.User
   ( User (..),
+    NewUser (..),
   )
 where
 
@@ -18,4 +19,14 @@ data User = User
   }
   deriving stock (Generic, Show, Eq)
   deriving anyclass (FromRow)
+  deriving (FromJSON, ToJSON)
+
+-- | Data type representing a new user.
+data NewUser = NewUser
+  { newUserName :: !Text,
+    newUserEmail :: !Email,
+    password :: !Text
+  }
+  deriving (Generic, Show, Eq)
+  deriving anyclass (ToRow)
   deriving (FromJSON, ToJSON)
