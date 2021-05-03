@@ -28,16 +28,6 @@
       "testsuite": "ultra -r yarn testsuite",
       "up": "ultra -r ncu -u --packageFile package.json && ncu -u --packageFile package.json"
    },
-   "lint-staged": {
-      "src": [
-         "yarn lint"
-      ]
-   },
-   "husky": {
-      "hooks": {
-         "pre-commit": "lint-staged"
-      }
-   },
    "devDependencies": {
       "husky": "6",
       "lint-staged": "^10.5.4",

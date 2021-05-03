@@ -54,3 +54,20 @@ export const withConn = <T>(
       },
       () => new DBError('db error')
    )
+
+export const withTransaction = <T>(
+   pool: Pool,
+   f: (conn: PoolClient) => Promise<T>
+): TE.TaskEither<DBError, T> => {
+   const queryP = () =>
+      pool.connect().then(async conn => {
+         await conn.query('BEGIN')
+         return f(conn)
+            .then(async res => {
+               await conn.query('COMMIT')
+               return res
+            })
+            .finally(() => conn.release())
+      })
+   return TE.tryCatch(queryP, () => new DBError('db error'))
+}
