@@ -1,1 +1,0 @@
-## Snips server implementation in haskell.
