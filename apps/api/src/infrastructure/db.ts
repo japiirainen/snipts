@@ -3,6 +3,7 @@ import { Pool, PoolClient } from 'pg'
 import { migrate } from 'postgres-migrations'
 import { CustomError } from 'ts-custom-error'
 import { v4 as uuidv4 } from 'uuid'
+
 import { config } from './config'
 import { ApplicationError } from './error'
 import { logger } from './logger'

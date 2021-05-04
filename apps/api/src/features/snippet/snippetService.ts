@@ -1,8 +1,11 @@
+import { Snippet } from '@snipts/types'
 import * as I from 'io-ts'
 import * as TE from 'fp-ts/TaskEither'
 import * as NEA from 'fp-ts/NonEmptyArray'
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
+import { CustomError } from 'ts-custom-error'
+
 import { Env } from '../../infrastructure/env'
 import { DBError } from '../../infrastructure/db'
 import {
@@ -10,8 +13,6 @@ import {
    InvalidRequest,
    ValidationFailed,
 } from '../../infrastructure/error'
-import { Snippet } from './snippet'
-import { CustomError } from 'ts-custom-error'
 import {
    allSnippets as getAllSnippets,
    findSnippetsByAuthor,
@@ -38,7 +39,7 @@ export type NewSnippetBodyT = I.TypeOf<typeof NewSnippetBody>
 export const newSnippet = (
    env: Env,
    rawBody: unknown
-): TE.TaskEither<DBError | ValidationFailed, Snippet> =>
+): TE.TaskEither<DBError | ValidationFailed, Snippet.Snippet> =>
    TE.fromEither(
       NewSnippetBody.decode(rawBody)['|>'](
          E.mapLeft(() => new InvalidRequest())
@@ -49,7 +50,10 @@ export const newSnippet = (
 
 export const allSnippets = (
    env: Env
-): TE.TaskEither<NoSnippetsError | DBError, NEA.NonEmptyArray<Snippet>> =>
+): TE.TaskEither<
+   NoSnippetsError | DBError,
+   NEA.NonEmptyArray<Snippet.Snippet>
+> =>
    getAllSnippets(env.pool)
       ['|>'](
          TE.chain(maybeSnippets =>
@@ -75,7 +79,7 @@ export const snippetsByAuthor = (
    rawBody: unknown
 ): TE.TaskEither<
    NoSnippetsError | DBError | UserNotFound | InvalidRequest,
-   NEA.NonEmptyArray<Snippet>
+   NEA.NonEmptyArray<Snippet.Snippet>
 > =>
    TE.fromEither(
       SnippetsByAuthorBody.decode(rawBody)['|>'](

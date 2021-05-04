@@ -1,6 +1,7 @@
-import { Request, Response } from 'express'
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
+import { Request, Response } from 'express'
+
 import { processError } from '../../infrastructure/error'
 import { allSnippets, newSnippet, snippetsByAuthor } from './snippetService'
 

@@ -1,6 +1,7 @@
 import { Response } from 'express'
 import { CustomError } from 'ts-custom-error'
 import { v4 as uuidv4 } from 'uuid'
+
 import { logger } from './logger'
 
 export interface ApplicationError extends Error {
@@ -16,7 +17,9 @@ export interface ApplicationError extends Error {
    log: boolean
 }
 
-export const processError = (res: Response) => (err: ApplicationError): void => {
+export const processError = (res: Response) => (
+   err: ApplicationError
+): void => {
    if (!err.code && !err.status) {
       err = new UnexpectedError(err.message)
    }

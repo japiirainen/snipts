@@ -1,9 +1,15 @@
-import { createDbPool } from '../../infrastructure/db'
-import { allSnippets, findSnippetById, insertSnippet, findSnippetsByAuthor } from './snippetRepo'
-import { Pool } from 'pg'
-import { pipe, identity } from 'fp-ts/function'
 import * as E from 'fp-ts/Either'
 import * as O from 'fp-ts/Option'
+import { pipe, identity } from 'fp-ts/function'
+import { Pool } from 'pg'
+
+import { createDbPool } from '../../infrastructure/db'
+import {
+   allSnippets,
+   findSnippetById,
+   insertSnippet,
+   findSnippetsByAuthor,
+} from './snippetRepo'
 import { insertUser } from '../auth/userRepo'
 
 const testSnippet = {
@@ -80,22 +86,23 @@ describe('snippets db test suite', () => {
 
    it('find a snippet by its id', async () => {
       const pool = await createDbPool()
-      const { id } = await insertSnippet(testSnippet, pool as Pool)().then(res =>
-         pipe(
-            res,
-            E.fold(
-               () => {
-                  throw new Error('this should throw')
-               },
-               o =>
-                  pipe(
-                     o,
-                     O.fold(() => {
-                        throw new Error('this should also throw')
-                     }, identity)
-                  )
+      const { id } = await insertSnippet(testSnippet, pool as Pool)().then(
+         res =>
+            pipe(
+               res,
+               E.fold(
+                  () => {
+                     throw new Error('this should throw')
+                  },
+                  o =>
+                     pipe(
+                        o,
+                        O.fold(() => {
+                           throw new Error('this should also throw')
+                        }, identity)
+                     )
+               )
             )
-         )
       )
       const snippet = await findSnippetById(id, pool as Pool)().then(res =>
          pipe(
@@ -142,7 +149,10 @@ describe('snippets db test suite', () => {
          )
       )
 
-      const snippets = await findSnippetsByAuthor(testSnippet.author, pool as Pool)().then(res =>
+      const snippets = await findSnippetsByAuthor(
+         testSnippet.author,
+         pool as Pool
+      )().then(res =>
          pipe(
             res,
             E.fold(

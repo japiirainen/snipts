@@ -1,7 +1,8 @@
-import { compare, hash } from 'bcrypt'
 import * as TE from 'fp-ts/TaskEither'
+import { compare, hash } from 'bcrypt'
 import { CustomError } from 'ts-custom-error'
 import { v4 as uuidv4 } from 'uuid'
+
 import { ApplicationError } from './error'
 
 export class BcryptError extends CustomError implements ApplicationError {
@@ -19,7 +20,9 @@ export const comparePasswords = (
       _ => new BcryptError('error while comparing passwords')
    )
 
-export const hashPassword = (password: string): TE.TaskEither<BcryptError, string> =>
+export const hashPassword = (
+   password: string
+): TE.TaskEither<BcryptError, string> =>
    TE.tryCatch(
       () => hash(password, 10),
       _ => new BcryptError('error while hashing password')

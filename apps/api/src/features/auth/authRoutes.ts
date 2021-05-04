@@ -1,13 +1,13 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import { Request, Response } from 'express'
+import { User } from '@snipts/types'
 import * as E from 'fp-ts/Either'
+import ms from 'ms'
+import { Request, Response } from 'express'
 import { pipe } from 'fp-ts/function'
+
 import { processError } from '../../infrastructure/error'
 import { register as processRegister } from './registerService'
 import { allUsers } from './userService'
 import { login as processLogin } from './loginService'
-import { toPublicUser } from './user'
-import ms from 'ms'
 import {
    generateAccessToken,
    generateRefreshToken,
@@ -25,7 +25,7 @@ const setRefreshToken = (res: Response, token: string) => {
 
 export const authRoutes = {
    me(req: Request, res: Response): void {
-      res.json(toPublicUser(req.env.user))
+      res.json(User.toPublicUser(req.env.user))
    },
 
    login(req: Request, res: Response): void {
@@ -34,7 +34,9 @@ export const authRoutes = {
             result,
             E.fold(processError(res), ({ accessToken, refreshToken, user }) => {
                setRefreshToken(res, refreshToken)
-               return res.status(200).json({ accessToken, user: toPublicUser(user) })
+               return res
+                  .status(200)
+                  .json({ accessToken, user: User.toPublicUser(user) })
             })
          )
       )
@@ -71,7 +73,9 @@ export const authRoutes = {
       allUsers(req.env)().then(r =>
          pipe(
             r,
-            E.fold(processError(res), ({ users }) => res.status(200).json({ users }))
+            E.fold(processError(res), ({ users }) =>
+               res.status(200).json({ users })
+            )
          )
       )
    },

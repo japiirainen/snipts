@@ -1,9 +1,9 @@
+import { User } from '@snipts/types'
 import { NextFunction, Request, Response } from 'express'
 import { Pool } from 'pg'
-import { User } from '../features/auth/user'
 
 export interface Env {
-   user: User
+   user: User.User
    pool: Pool
 }
 

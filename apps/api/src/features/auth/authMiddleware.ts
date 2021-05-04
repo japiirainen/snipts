@@ -1,12 +1,21 @@
-import { Request, Response, NextFunction } from 'express'
 import * as O from 'fp-ts/Option'
 import * as TE from 'fp-ts/TaskEither'
 import * as T from 'fp-ts/Task'
 import { pipe } from 'fp-ts/function'
-import { getAccessTokenFromRequest, verifyAccessToken, JwtError } from '../../infrastructure/jwt'
+import { Request, Response, NextFunction } from 'express'
+
+import {
+   getAccessTokenFromRequest,
+   verifyAccessToken,
+   JwtError,
+} from '../../infrastructure/jwt'
 import { findUserByUsername } from './userRepo'
 
-export const optionalUser = (req: Request, _: Response, next: NextFunction): Promise<void> =>
+export const optionalUser = (
+   req: Request,
+   _: Response,
+   next: NextFunction
+): Promise<void> =>
    pipe(
       getAccessTokenFromRequest(req),
       TE.fromOption(() => new JwtError()),
@@ -29,7 +38,11 @@ export const optionalUser = (req: Request, _: Response, next: NextFunction): Pro
       )
    )
 
-export const requireUser = (req: Request, res: Response, next: NextFunction): Promise<void> =>
+export const requireUser = (
+   req: Request,
+   res: Response,
+   next: NextFunction
+): Promise<void> =>
    optionalUser(req, res, () => {
       if (!req.env.user) {
          process.env.NODE_ENV === 'testing' ? next() : res.status(401).send()

@@ -1,14 +1,17 @@
+import { User } from '@snipts/types'
 import * as E from 'fp-ts/Either'
-import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
-import * as I from 'io-ts'
+import { pipe } from 'fp-ts/function'
 import { CustomError } from 'ts-custom-error'
+
 import { BcryptError, comparePasswords } from '../../infrastructure/bcrypt'
 import { DBError } from '../../infrastructure/db'
 import { Env } from '../../infrastructure/env'
 import { ApplicationError, InvalidRequest } from '../../infrastructure/error'
-import { generateAccessToken, generateRefreshToken } from '../../infrastructure/jwt'
-import { User } from './user'
+import {
+   generateAccessToken,
+   generateRefreshToken,
+} from '../../infrastructure/jwt'
 import { findUserByUsername } from './userRepo'
 
 export class UserNotFound extends CustomError implements ApplicationError {
@@ -16,13 +19,6 @@ export class UserNotFound extends CustomError implements ApplicationError {
    code = 'UserNotFound'
    log = true
 }
-
-const LoginBody = I.interface({
-   username: I.string,
-   password: I.string,
-})
-
-export type LoginBodyT = I.TypeOf<typeof LoginBody>
 
 export const login = (
    env: Env,
@@ -32,13 +28,13 @@ export const login = (
    {
       accessToken: string
       refreshToken: string
-      user: User
+      user: User.User
    }
 > =>
    pipe(
       TE.fromEither(
          pipe(
-            LoginBody.decode(rawBody),
+            User.LoginBody.decode(rawBody),
             E.mapLeft(() => new InvalidRequest())
          )
       ),
@@ -53,7 +49,9 @@ export const login = (
                      pipe(
                         comparePasswords(user.password, body.password),
                         TE.chain(isSamePassword =>
-                           isSamePassword ? TE.right(user) : TE.left(new UserNotFound())
+                           isSamePassword
+                              ? TE.right(user)
+                              : TE.left(new UserNotFound())
                         )
                      )
                   )
