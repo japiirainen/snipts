@@ -51,13 +51,16 @@ module.exports = {
          'error',
          {
             'newlines-between': 'always',
-            pathGroups: [{ pattern: '@/**', group: 'external', position: 'after' }],
+            pathGroups: [
+               { pattern: '@/**', group: 'external', position: 'after' },
+            ],
             alphabetize: { order: 'asc' },
             groups: ['builtin', 'external', 'parent', 'sibling', 'index'],
          },
       ],
       'object-shorthand': 'error',
       'prefer-destructuring': 'warn',
+      'no-unexpected-multiline': 'off',
 
       // a nice idea for some parts of the code, but definitely not all.
       '@typescript-eslint/explicit-module-boundary-types': 'off',
