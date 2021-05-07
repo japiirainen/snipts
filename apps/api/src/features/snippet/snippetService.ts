@@ -1,10 +1,8 @@
-import { Snippet } from '@snipts/types'
 import * as I from 'io-ts'
 import * as TE from 'fp-ts/TaskEither'
 import * as NEA from 'fp-ts/NonEmptyArray'
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
-import { CustomError } from 'ts-custom-error'
 
 import { Env } from '../../infrastructure/env'
 import { DBError } from '../../infrastructure/db'
@@ -13,6 +11,8 @@ import {
    InvalidRequest,
    ValidationFailed,
 } from '../../infrastructure/error'
+import { Snippet } from '@snipts/types'
+import { CustomError } from 'ts-custom-error'
 import {
    allSnippets as getAllSnippets,
    findSnippetsByAuthor,
@@ -40,13 +40,16 @@ export const newSnippet = (
    env: Env,
    rawBody: unknown
 ): TE.TaskEither<DBError | ValidationFailed, Snippet.Snippet> =>
-   TE.fromEither(
-      NewSnippetBody.decode(rawBody)['|>'](
-         E.mapLeft(() => new InvalidRequest())
-      )
+   pipe(
+      TE.fromEither(
+         pipe(
+            NewSnippetBody.decode(rawBody),
+            E.mapLeft(() => new InvalidRequest())
+         )
+      ),
+      TE.chain(newPost => insertSnippet(newPost, env.pool)),
+      TE.chain(TE.fromOption(() => new DBError()))
    )
-      ['|>'](TE.chain(newPost => insertSnippet(newPost, env.pool)))
-      ['|>'](TE.chain(TE.fromOption(() => new DBError())))
 
 export const allSnippets = (
    env: Env
@@ -54,19 +57,22 @@ export const allSnippets = (
    NoSnippetsError | DBError,
    NEA.NonEmptyArray<Snippet.Snippet>
 > =>
-   getAllSnippets(env.pool)
-      ['|>'](
-         TE.chain(maybeSnippets =>
-            maybeSnippets['|>'](TE.fromOption(() => new DBError()))
+   pipe(
+      getAllSnippets(env.pool),
+      TE.chain(maybeSnippets =>
+         pipe(
+            maybeSnippets,
+            TE.fromOption(() => new DBError())
+         )
+      ),
+      TE.chain(snippets =>
+         pipe(
+            snippets,
+            NEA.fromArray,
+            TE.fromOption(() => new NoSnippetsError())
          )
       )
-      ['|>'](
-         TE.chain(snippets =>
-            snippets['|>'](NEA.fromArray)['|>'](
-               TE.fromOption(() => new NoSnippetsError())
-            )
-         )
-      )
+   )
 
 const SnippetsByAuthorBody = I.interface({
    author: I.number,
@@ -81,37 +87,40 @@ export const snippetsByAuthor = (
    NoSnippetsError | DBError | UserNotFound | InvalidRequest,
    NEA.NonEmptyArray<Snippet.Snippet>
 > =>
-   TE.fromEither(
-      SnippetsByAuthorBody.decode(rawBody)['|>'](
-         E.mapLeft(() => new InvalidRequest())
-      )
-   )
-      ['|>'](
-         TE.chain(({ author }) =>
-            findUserById(author, env.pool)['|>'](
-               TE.chain(maybeUser =>
-                  pipe(
-                     maybeUser,
-                     TE.fromOption(() => new UserNotFound())
-                  )
+   pipe(
+      TE.fromEither(
+         pipe(
+            SnippetsByAuthorBody.decode(rawBody),
+            E.mapLeft(() => new InvalidRequest())
+         )
+      ),
+      TE.chain(({ author }) =>
+         pipe(
+            findUserById(author, env.pool),
+            TE.chain(maybeUser =>
+               pipe(
+                  maybeUser,
+                  TE.fromOption(() => new UserNotFound())
+               )
+            )
+         )
+      ),
+      TE.chain(user =>
+         pipe(
+            findSnippetsByAuthor(user.id, env.pool),
+            TE.chain(maybeSnippets =>
+               pipe(
+                  maybeSnippets,
+                  TE.fromOption(() => new DBError())
+               )
+            ),
+            TE.chain(snippets =>
+               pipe(
+                  snippets,
+                  NEA.fromArray,
+                  TE.fromOption(() => new NoSnippetsError())
                )
             )
          )
       )
-      ['|>'](
-         TE.chain(user =>
-            findSnippetsByAuthor(user.id, env.pool)
-               ['|>'](
-                  TE.chain(maybeSnippets =>
-                     maybeSnippets['|>'](TE.fromOption(() => new DBError()))
-                  )
-               )
-               ['|>'](
-                  TE.chain(snippets =>
-                     snippets['|>'](NEA.fromArray)['|>'](
-                        TE.fromOption(() => new NoSnippetsError())
-                     )
-                  )
-               )
-         )
-      )
+   )
