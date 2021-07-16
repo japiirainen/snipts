@@ -1,9 +1,9 @@
 
 version: '3.4'
 services:
-  shopping_cart:
+  snipts:
     restart: always
-    image: snipts-core:latest
+    image: snipts-server:latest
     network_mode: host
     environment:
       - DEBUG=false
