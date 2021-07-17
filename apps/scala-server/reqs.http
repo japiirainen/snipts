@@ -1,4 +1,25 @@
-POST http://127.0.0.1:6000/api/v1/users HTTP/1.1
+POST http://127.0.0.1:6000/v1/auth/users HTTP/1.1
+content-type: application/json
+
+{
+    "username": "joona",
+    "password": "joona"
+}
+
+###
+
+POST http://127.0.0.1:6000/v1/auth/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "joona",
+    "password": "joona"
+}
+
+###
+
+POST http://127.0.0.1:6000/v1/auth/logout HTTP/1.1
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MjgzMjgyNDQsImlhdCI6MTYyNjUyODI0NCwxMDIxYjlmMi03NjZkLTQyMTMtYTQ5Ny1jNGFhNDllYmRlZTB9.GmAFN4EyulGHgQmAdee0D6DtQXdc6ex0k1DbxpTplOo
 content-type: application/json
 
 {

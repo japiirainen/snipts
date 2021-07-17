@@ -69,6 +69,6 @@ private object UserSQL {
   val insertUser: Command[User ~ EncryptedPassword] =
     sql"""
          INSERT INTO users
-         VALUES name = $codec
+         VALUES ($codec)
        """.command
 }

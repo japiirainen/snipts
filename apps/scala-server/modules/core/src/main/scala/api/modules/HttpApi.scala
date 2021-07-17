@@ -38,7 +38,7 @@ sealed abstract class HttpApi[F[_]: Async] private (
   // Open routes
 
   val openRoutes: HttpRoutes[F] =
-    loginRoutes <+> logoutRoutes <+> userRoutes
+    userRoutes <+> loginRoutes <+> logoutRoutes
 
   private val routes: HttpRoutes[F] = Router(
     version.v1 -> openRoutes
