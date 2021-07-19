@@ -23,7 +23,7 @@ object Crypto {
         val random  = new SecureRandom()
         val ivBytes = new Array[Byte](16)
         random.nextBytes(ivBytes)
-        val iv       = new IvParameterSpec(ivBytes)
+        val iv       = new IvParameterSpec(ivBytes);
         val salt     = passwordSalt.secret.value.getBytes("UTF-8")
         val keySpec  = new PBEKeySpec("password".toCharArray(), salt, 65536, 256)
         val factory  = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
@@ -46,11 +46,12 @@ object Crypto {
             }
 
             def decrypt(password: EncryptedPassword): Password = {
-              val base64 = Base64.getEncoder()
-              val bytes  = password.value.getBytes("UTF-8")
-              val result = new String(base64.encode(dc.value.doFinal(bytes)), "UTF-8")
+              val base64 = Base64.getDecoder()
+              val bytes  = base64.decode(password.value.getBytes("UTF-8"))
+              val result = new String(dc.value.doFinal(bytes), "UTF-8")
               Password(result)
             }
           }
       }
+
 }
